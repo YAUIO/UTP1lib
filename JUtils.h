@@ -40,6 +40,20 @@ public:
 
         return jarr;
     }
+
+    static jintArray tointarr(std::vector<int> const& vec, JNIEnv *env) {
+        auto jarr = env->NewIntArray(static_cast<jsize>(vec.size()));
+
+        int arr[vec.size()];
+
+        for (int i = 0; i < vec.size(); i++) {
+            arr[i] = vec[i];
+        }
+
+        env->SetIntArrayRegion(jarr,0,static_cast<jsize>(vec.size()),arr);
+
+        return jarr;
+    }
 };
 
 

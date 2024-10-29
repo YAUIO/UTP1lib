@@ -12,6 +12,8 @@ struct Game {
     int crosses;
     int circles;
 
+    std::vector<int> lastStep;
+
     enum Mark {
         Empty,
         Cross,
@@ -26,10 +28,12 @@ struct Game {
                 if (nextCross) {
                     nextCross = false;
                     board[yp][xp] = Cross;
+                    lastStep = {Cross,yp,xp};
                     crosses++;
                 } else {
                     nextCross = true;
                     board[yp][xp] = Circle;
+                    lastStep = {Circle,yp,xp};
                     circles++;
                 }
             }
@@ -39,13 +43,13 @@ struct Game {
     void check() {
         if (crosses >= 5) {
             if (wonBy(Cross)) {
-                board[0][0] = WonCross;
+                lastStep = {WonCross,0,0};
             }
         }
 
         if (circles >= 5) {
             if (wonBy(Circle)) {
-                board[0][0] = WonCircle;
+                lastStep = {WonCircle,0,0};
             }
         }
     }
@@ -164,7 +168,9 @@ private:
 
         for (auto const& row : vec) {
             v.emplace_back();
-            v.push_back(std::ranges::reverse_copy(row,v[v.size()-1]));
+            for (int i = row.size() - 1 ; i >= 0; i-=1) {
+                v[v.size()-1].push_back(row[i]);
+            }
         }
 
         return v;
@@ -175,7 +181,7 @@ private:
             return true;
         }
 
-        if (checkRows(val,flip45(flip(board)))) {
+        if (checkRows(val,flip45(reverse2d(board)))) {
             return true;
         }
 
@@ -208,6 +214,7 @@ JNIEXPORT void JNICALL Java_Game_initialize
     game.size = size;
     game.nextCross = true;
     game.board = std::vector<std::vector<int> >();
+    game.lastStep = {Game::Empty,0,0};
 
     int row = 0;
     int i = 0;
@@ -216,19 +223,21 @@ JNIEXPORT void JNICALL Java_Game_initialize
         game.board.emplace_back();
         i = 0;
         while (i < static_cast<int>(size)) {
-            game.board[row].push_back(Game::Mark::Empty);
+            game.board[row].push_back(Game::Empty);
             i++;
         }
         row++;
     }
 }
 
-JNIEXPORT jobjectArray JNICALL Java_Game_fetchInternal
+JNIEXPORT jintArray JNICALL Java_Game_fetchInternal
 (JNIEnv *env, jobject, jint const jxp, jint const jyp) {
+    game.lastStep = {0,0,0};
+
     if (jxp != -1 && jyp != -1) {
         game.update(jxp, jyp);
         game.check();
     }
 
-    return JUtils::to_int2d_jobject_array(game.board, env);
+    return JUtils::tointarr(game.lastStep,env);
 }

@@ -21,7 +21,7 @@ extern "C" {
  * Method:    fetchInternal
  * Signature: (II)[[I
  */
-JNIEXPORT jobjectArray JNICALL Java_Game_fetchInternal
+JNIEXPORT jintArray JNICALL Java_Game_fetchInternal
   (JNIEnv *, jobject, jint, jint);
 
 /*
