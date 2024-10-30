@@ -42,7 +42,7 @@ JNIEXPORT jint JNICALL Java_Game_getValue //only to test initialization
 JNIEXPORT jint JNICALL Java_Game_getSize //only to test initialization
   (JNIEnv *, jobject);
 
-JNIEXPORT void JNICALL Java_Game_setValue
+JNIEXPORT void JNICALL Java_Game_setValue //only to test wincondition
   (JNIEnv *, jobject, jint x, jint y, jint val);
 
 #ifdef __cplusplus
