@@ -29,12 +29,12 @@ struct Game {
                 if (nextCross) {
                     nextCross = false;
                     board[yp][xp] = Cross;
-                    lastStep = {Cross,yp,xp};
+                    lastStep = {Cross, yp, xp};
                     crosses++;
                 } else {
                     nextCross = true;
                     board[yp][xp] = Circle;
-                    lastStep = {Circle,yp,xp};
+                    lastStep = {Circle, yp, xp};
                     circles++;
                 }
             }
@@ -44,26 +44,26 @@ struct Game {
     void check() {
         if (crosses >= 5) {
             if (wonBy(Cross)) {
-                lastStep = {WonCross,0,0};
+                lastStep = {WonCross, 0, 0};
             }
         }
 
         if (circles >= 5) {
             if (wonBy(Circle)) {
-                lastStep = {WonCircle,0,0};
+                lastStep = {WonCircle, 0, 0};
             }
         }
 
-        if (crosses + circles == size*size) {
+        if (crosses + circles == size * size) {
             if (checkDraw()) {
-                lastStep = {Draw,0,0};
+                lastStep = {Draw, 0, 0};
             }
         }
     }
 
 private:
     template<typename T>
-        static std::vector<std::vector<T> > flip45(std::vector<std::vector<T> > const &vec) {
+    static std::vector<std::vector<T> > flip45(std::vector<std::vector<T> > const &vec) {
         auto v = std::vector<std::vector<T> >();
 
         for (int i = 0; i < (vec.size() * 2); i++) {
@@ -169,26 +169,26 @@ private:
         return checkRows(val, flip(board));
     }
 
-    template <typename T>
-    static std::vector<std::vector<T>> reverse2d(std::vector<std::vector<T>> const & vec) {
-        auto v = std::vector<std::vector<T>>();
+    template<typename T>
+    static std::vector<std::vector<T> > reverse2d(std::vector<std::vector<T> > const &vec) {
+        auto v = std::vector<std::vector<T> >();
 
-        for (auto const& row : vec) {
+        for (auto const &row: vec) {
             v.emplace_back();
-            for (int i = row.size() - 1 ; i >= 0; i-=1) {
-                v[v.size()-1].push_back(row[i]);
+            for (int i = row.size() - 1; i >= 0; i -= 1) {
+                v[v.size() - 1].push_back(row[i]);
             }
         }
 
         return v;
     }
 
-    bool checkDiag(int const& val) {
-        if (checkRows(val,flip45(board))) {
+    bool checkDiag(int const &val) {
+        if (checkRows(val, flip45(board))) {
             return true;
         }
 
-        if (checkRows(val,flip45(reverse2d(board)))) {
+        if (checkRows(val, flip45(reverse2d(board)))) {
             return true;
         }
 
@@ -212,8 +212,8 @@ private:
     }
 
     bool checkDraw() {
-        for (auto const& row : board) {
-            for (auto const& entry : row) {
+        for (auto const &row: board) {
+            for (auto const &entry: row) {
                 if (entry == Empty) {
                     return false;
                 }
@@ -232,7 +232,7 @@ JNIEXPORT void JNICALL Java_Game_initialize
     game.size = size;
     game.nextCross = true;
     game.board = std::vector<std::vector<int> >();
-    game.lastStep = {Game::Empty,0,0};
+    game.lastStep = {Game::Empty, 0, 0};
 
     int row = 0;
     int i = 0;
@@ -250,12 +250,34 @@ JNIEXPORT void JNICALL Java_Game_initialize
 
 JNIEXPORT jintArray JNICALL Java_Game_fetchInternal
 (JNIEnv *env, jobject, jint const jxp, jint const jyp) {
-    game.lastStep = {0,0,0};
+    game.lastStep = {0, 0, 0};
 
     if (jxp != -1 && jyp != -1) {
         game.update(jxp, jyp);
         game.check();
     }
 
-    return JUtils::tointarr(game.lastStep,env);
+    return JUtils::tointarr(game.lastStep, env);
+}
+
+//METHODS FOR TESTS
+
+JNIEXPORT jint JNICALL Java_Game_getValue
+(JNIEnv *, jobject, jint const x, jint const y) {
+    return static_cast<jint>(game.board[x][y]);
+}
+
+JNIEXPORT void JNICALL Java_Game_setValue
+(JNIEnv *, jobject, jint const x, jint const y, jint const val) {
+    if (val == Game::Circle) {
+        game.circles++;
+    }else if (val == Game::Cross) {
+        game.crosses++;
+    }
+    game.board[x][y] = val;
+}
+
+JNIEXPORT jint JNICALL Java_Game_getSize
+(JNIEnv *, jobject) {
+    return static_cast<jint>(game.board.size());
 }

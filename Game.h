@@ -32,6 +32,19 @@ JNIEXPORT jintArray JNICALL Java_Game_fetchInternal
 JNIEXPORT void JNICALL Java_Game_initialize
   (JNIEnv *, jobject, jint);
 
+
+
+//METHODS FOR TESTS
+
+JNIEXPORT jint JNICALL Java_Game_getValue //only to test initialization
+  (JNIEnv *, jobject, jint, jint);
+
+JNIEXPORT jint JNICALL Java_Game_getSize //only to test initialization
+  (JNIEnv *, jobject);
+
+JNIEXPORT void JNICALL Java_Game_setValue
+  (JNIEnv *, jobject, jint x, jint y, jint val);
+
 #ifdef __cplusplus
 }
 #endif
