@@ -19,7 +19,8 @@ struct Game {
         Cross,
         Circle,
         WonCross,
-        WonCircle
+        WonCircle,
+        Draw
     };
 
     void update(int const &xp, int const &yp) {
@@ -50,6 +51,12 @@ struct Game {
         if (circles >= 5) {
             if (wonBy(Circle)) {
                 lastStep = {WonCircle,0,0};
+            }
+        }
+
+        if (crosses + circles == size*size) {
+            if (checkDraw()) {
+                lastStep = {Draw,0,0};
             }
         }
     }
@@ -202,6 +209,17 @@ private:
         }
 
         return false;
+    }
+
+    bool checkDraw() {
+        for (auto const& row : board) {
+            for (auto const& entry : row) {
+                if (entry == Empty) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 };
 
