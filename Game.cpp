@@ -264,14 +264,17 @@ JNIEXPORT jintArray JNICALL Java_Game_fetchInternal
 
 JNIEXPORT jint JNICALL Java_Game_getValue
 (JNIEnv *, jobject, jint const x, jint const y) {
-    return static_cast<jint>(game.board[x][y]);
+    if (x < game.board.size() && y < game.board[x].size()) {
+        return static_cast<jint>(game.board[x][y]);
+    }
+    return 0;
 }
 
 JNIEXPORT void JNICALL Java_Game_setValue
 (JNIEnv *, jobject, jint const x, jint const y, jint const val) {
     if (val == Game::Circle) {
         game.circles++;
-    }else if (val == Game::Cross) {
+    } else if (val == Game::Cross) {
         game.crosses++;
     }
     game.board[x][y] = val;
